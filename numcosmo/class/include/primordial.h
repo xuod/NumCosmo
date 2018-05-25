@@ -5,7 +5,7 @@
 
 #include "perturbations.h"
 
-/** enum defining how the primordial spectrum should be computed */
+/** enum defining how should the primnordial spectrum be compurted */
 
 enum primordial_spectrum_type {
   analytic_Pk,
@@ -13,8 +13,7 @@ enum primordial_spectrum_type {
   inflation_V,
   inflation_H,
   inflation_V_end,
-  external_Pk,
-  external_Pk_callback
+  external_Pk
 };
 
 /** enum defining whether the spectrum routine works with linear or logarithmic input/output */
@@ -28,8 +27,7 @@ enum linear_or_logarithmic {
 
 enum potential_shape {
   polynomial,
-  natural,
-  higgs_inflation
+  natural
 };
 
 /** enum defining which quantity plays the role of a target for evolving inflationary equations */
@@ -37,8 +35,7 @@ enum potential_shape {
 enum target_quantity {
   _aH_,
   _phi_,
-  _end_inflation_,
-  _a_
+  _end_inflation_
 };
 
 /** enum specifying if we want to integrate equations forward or backward in time */
@@ -55,21 +52,6 @@ enum time_definition {
   proper
 };
 
-/** enum specifying how, in the inflation_V_end case, the value of phi_pivot should calculated */
-
-enum phi_pivot_methods {
-  N_star,
-  ln_aH_ratio,
-  ln_aH_ratio_auto
-};
-
-/** enum specifying how the inflation module computes the primordial spectrum (default: numerical) */
-
-enum inflation_module_behavior {
-  numerical,
-  analytical
-};
-
 /**
  * Structure containing everything about primordial spectra that other modules need to know.
  *
@@ -80,39 +62,39 @@ enum inflation_module_behavior {
 struct primordial {
 
   /** @name - input parameters initialized by user in input module
-      (all other quantities are computed in this module, given these parameters
+      (all other quantitites are computed in this module, given these parameters
       and the content of the 'precision' and 'perturbs' structures) */
 
   //@{
 
-  double k_pivot; /**< pivot scale in \f$ Mpc^{-1} \f$ */
+  double k_pivot; /**< pivot scale in Mpc-1 */
 
   enum primordial_spectrum_type primordial_spec_type; /**< type of primordial spectrum (simple analytic from, integration of inflationary perturbations, etc.) */
 
-  /* - parameters describing the case primordial_spec_type = analytic_Pk : amplitudes, tilts, runnings, cross-correlations, ... */
+  /** - parameters describing the case primordial_spec_type = analytic_Pk : amplitudes, tilts, runnings, cross-correlations, ... */
 
   double A_s;  /**< usual scalar amplitude = curvature power spectrum at pivot scale */
   double n_s;  /**< usual scalar tilt = [curvature power spectrum tilt at pivot scale -1] */
   double alpha_s; /**< usual scalar running */
   double beta_s;  /**< running of running */
 
-  double r;    /**< usual tensor to scalar ratio of power spectra, \f$ r=A_T/A_S=P_h/P_R \f$*/
+  double r;    /**< usual tensor to scalar ratio of power spectra, r=A_T/A_S=P_h/P_R */
   double n_t;  /**< usual tensor tilt = [GW power spectrum tilt at pivot scale] */
   double alpha_t; /**< usual tensor running */
 
-  double f_bi;  /**< baryon isocurvature (BI) entropy-to-curvature ratio \f$ S_{bi}/R \f$*/
+  double f_bi;  /**< baryon isocurvature (BI) entropy-to-curvature ratio S_bi/R */
   double n_bi;  /**< BI tilt */
   double alpha_bi; /**< BI running */
 
-  double f_cdi;  /**< CDM isocurvature (CDI) entropy-to-curvature ratio \f$ S_{cdi}/R \f$*/
+  double f_cdi;  /**< CDM isocurvature (CDI) entropy-to-curvature ratio S_cdi/R */
   double n_cdi;  /**< CDI tilt */
   double alpha_cdi; /**< CDI running */
 
-  double f_nid;  /**< neutrino density isocurvature (NID) entropy-to-curvature ratio \f$ S_{nid}/R \f$*/
+  double f_nid;  /**< neutrino density isocurvature (NID) entropy-to-curvature ratio S_nid/R */
   double n_nid;  /**< NID tilt */
   double alpha_nid; /**< NID running */
 
-  double f_niv;  /**< neutrino velocity isocurvature (NIV) entropy-to-curvature ratio \f$ S_{niv}/R \f$*/
+  double f_niv;  /**< neutrino velocity isocurvature (NIV) entropy-to-curvature ratio S_niv/R */
   double n_niv;  /**< NIV tilt */
   double alpha_niv; /**< NIV running */
 
@@ -156,46 +138,42 @@ struct primordial {
   double n_nid_niv; /**< NIDxNIV cross-correlation tilt */
   double alpha_nid_niv; /**< NIDxNIV cross-correlation running */
 
-  /** parameters describing the case primordial_spec_type = inflation_V */
+  /** - parameters describing the case primordial_spec_type = inflation_V */
 
   enum potential_shape potential;
 
-  double V0;	/**< one parameter of the function V(phi) */
-  double V1;	/**< one parameter of the function V(phi) */
-  double V2;	/**< one parameter of the function V(phi) */
-  double V3;	/**< one parameter of the function V(phi) */
-  double V4;	/**< one parameter of the function V(phi) */
+  double V0;
+  double V1;
+  double V2;
+  double V3;
+  double V4;
 
-  /* parameters describing the case primordial_spec_type = inflation_H */
+  /** - parameters describing the case primordial_spec_type = inflation_H */
 
-  double H0;	/**< one parameter of the function H(phi) */
-  double H1;	/**< one parameter of the function H(phi) */
-  double H2;	/**< one parameter of the function H(phi) */
-  double H3;	/**< one parameter of the function H(phi) */
-  double H4;	/**< one parameter of the function H(phi) */
+  double H0;
+  double H1;
+  double H2;
+  double H3;
+  double H4;
 
-  /* parameters describing inflation_V_end */
+  /** - parameters describing inflation_V_end */
 
-  double phi_end;	/**< value of inflaton at the end of inflation */
-  enum phi_pivot_methods phi_pivot_method; /**< flag for method used to define and find the pivot scale */
-  double phi_pivot_target; /**< For each of the above methods, critical value to be reached between pivot and end of inflation (N_star, [aH]ratio, etc.) */
+  double phi_end;
+  double ln_aH_ratio;
 
-  /* behavior of the inflation module */
-  enum inflation_module_behavior behavior; /**< Specifies if the inflation module computes the primordial spectrum numerically (default) or analytically*/
+  /** - 'external_Pk' mode: command generating the table of Pk and custom parameters to be passed to it */
 
-  /** 'external_Pk' mode: command generating the table of Pk and custom parameters to be passed to it */
-
-  char*  command;  /**< string with the command for calling 'external_Pk' */
-  double custom1;  /**< one parameter of the primordial computed in 'external_Pk' */
-  double custom2;  /**< one parameter of the primordial computed in 'external_Pk' */
-  double custom3;  /**< one parameter of the primordial computed in 'external_Pk' */
-  double custom4;  /**< one parameter of the primordial computed in 'external_Pk' */
-  double custom5;  /**< one parameter of the primordial computed in 'external_Pk' */
-  double custom6;  /**< one parameter of the primordial computed in 'external_Pk' */
-  double custom7;  /**< one parameter of the primordial computed in 'external_Pk' */
-  double custom8;  /**< one parameter of the primordial computed in 'external_Pk' */
-  double custom9;  /**< one parameter of the primordial computed in 'external_Pk' */
-  double custom10; /**< one parameter of the primordial computed in 'external_Pk' */
+  char*  command;
+  double custom1;
+  double custom2;
+  double custom3;
+  double custom4;
+  double custom5;
+  double custom6;
+  double custom7;
+  double custom8;
+  double custom9;
+  double custom10;
 
   //@}
 
@@ -270,7 +248,7 @@ struct primordial {
   int index_in_ah_im;   /**< tensor perturbation (imaginary part) */
   int index_in_dah_re;  /**< tensor perturbation (real part, time derivative) */
   int index_in_dah_im;  /**< tensor perturbation (imaginary part, time derivative) */
-  int in_bg_size;       /**< size of vector of background quantities only */
+  int in_bg_size;       /**< size of vector of background quantitites only */
   int in_size;          /**< full size of vector */
 
   //@}
@@ -283,8 +261,8 @@ struct primordial {
                             phi_pivot (set to 0 for inflation_V,
                             inflation_H; found by code for
                             inflation_V_end) */
-  double phi_min;        /**< in inflationary module, value of phi when \f$ k_{min}=aH \f$*/
-  double phi_max;        /**< in inflationary module, value of phi when \f$ k_{max}=aH \f$*/
+  double phi_min;        /**< in inflationary module, value of phi when k_min=aH */
+  double phi_max;        /**< in inflationary module, value of phi when k_max=aH */
   double phi_stop;       /**< in inflationary module, value of phi at the end of inflation */
 
   //@}
@@ -298,12 +276,6 @@ struct primordial {
   //@}
 
   ErrorMsg error_message; /**< zone for writing error messages */
-
-  /* external callback support */
-
-  double (*external_Pk_callback_pks) (const double lnk, void *data);
-  double (*external_Pk_callback_pkt) (const double lnk, void *data);
-  void *external_Pk_callback_data;
 
 };
 
@@ -335,7 +307,7 @@ struct primordial_inflation_parameters_and_workspace {
 
 
 /*************************************************************************************************************/
-/* @cond INCLUDE_WITH_DOXYGEN */
+
 /*
  * Boilerplate for C++
  */
@@ -413,27 +385,14 @@ extern "C" {
                                            struct precision * ppr
                                            );
 
-  int primordial_inflation_analytic_spectra(
-                                            struct perturbs * ppt,
-                                            struct primordial * ppm,
-                                            struct precision * ppr,
-                                            double * y_ini
-                                            );
-
   int primordial_inflation_spectra(
                                    struct perturbs * ppt,
                                    struct primordial * ppm,
                                    struct precision * ppr,
-                                   double * y_ini
+                                   double * y_ini,
+                                   double * y,
+                                   double * dy
                                    );
-
-  int primordial_inflation_one_wavenumber(
-                                          struct perturbs * ppt,
-                                          struct primordial * ppm,
-                                          struct precision * ppr,
-                                          double * y_ini,
-                                          int index_k
-                                          );
 
   int primordial_inflation_one_k(
                                  struct primordial * ppm,
@@ -511,11 +470,6 @@ extern "C" {
                                         struct primordial * ppm
                                         );
 
-  int primordial_external_callback_spectrum_init(
-                                        struct perturbs * ppt,
-                                        struct primordial * ppm
-                                        );
-
   int primordial_output_titles(struct perturbs * ppt,
                                struct primordial * ppm,
                                char titles[_MAXTITLESTRINGLENGTH_]
@@ -542,4 +496,3 @@ extern "C" {
 //@}
 
 #endif
-/* @endcond */

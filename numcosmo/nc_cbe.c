@@ -118,7 +118,7 @@ nc_cbe_init (NcCBE *cbe)
 	cbe->thermodyn_prepared = FALSE;
 
 	/* background structure */
-  
+
 	cbe->priv->pba.h                   = 0.0;
 	cbe->priv->pba.H0                  = 0.0;
 	cbe->priv->pba.T_cmb               = 0.0;
@@ -157,8 +157,20 @@ nc_cbe_init (NcCBE *cbe)
 	cbe->priv->pba.cs2_fld             = 0.0;
   cbe->priv->pba.shooting_failed     = _FALSE_;
 
+	cbe->priv->pba.
+
+	//**NonLocal: */
+	cbe->priv->pba.model = 0.0;/**0=LCDM, 1=R Box^-2 R, 2=(g_munu R)^T*/
+	cbe->priv->pba.gnl = 0.0;/**gamma*/
+	cbe->priv->pba.Omega0_nlde = 0.0; /**Nonlocal dark energy density fraction*/
+	//**NonLocal: definition of background initial condition for auxiliary fields*/
+	cbe->priv->pba.U_ini_nlde = 0.0;
+	cbe->priv->pba.U_prime_ini_nlde = 0.0;
+	cbe->priv->pba.V_ini_nlde = 0.0;
+	cbe->priv->pba.V_prime_ini_nlde = 0.0;
+
 	/* thermodynamics structure */
-  
+
 	cbe->priv->pth.YHe                        = 0;
 	cbe->priv->pth.recombination              = 0;
 	cbe->priv->pth.reio_parametrization       = 0;
@@ -189,7 +201,7 @@ nc_cbe_init (NcCBE *cbe)
   cbe->priv->pth.compute_damping_scale      = _FALSE_;
 
 	/* perturbation structure */
-  
+
 	cbe->priv->ppt.has_perturbations                   = _FALSE_;
 	cbe->priv->ppt.has_cls                             = _FALSE_;
 
@@ -201,7 +213,7 @@ nc_cbe_init (NcCBE *cbe)
 	cbe->priv->ppt.has_pk_matter                       = _FALSE_;
 	cbe->priv->ppt.has_density_transfers               = _FALSE_;
 	cbe->priv->ppt.has_velocity_transfers              = _FALSE_;
-  
+
 	cbe->priv->ppt.has_nl_corrections_based_on_delta_m = _FALSE_;
 
 	cbe->priv->ppt.has_nc_density                      = _FALSE_;
@@ -221,7 +233,7 @@ nc_cbe_init (NcCBE *cbe)
 	cbe->priv->ppt.has_cdi                             = _FALSE_;
 	cbe->priv->ppt.has_nid                             = _FALSE_;
 	cbe->priv->ppt.has_niv                             = _FALSE_;
-  
+
 	cbe->priv->ppt.has_perturbed_recombination         = _FALSE_;
 	cbe->priv->ppt.tensor_method                       = tm_massless_approximation;
 	cbe->priv->ppt.evolve_tensor_ur                    = _FALSE_;
@@ -254,9 +266,9 @@ nc_cbe_init (NcCBE *cbe)
 			cbe->priv->ppt.tensor_perturbations_data[filenum] = NULL;
 		}
 	}
-  
+
 	cbe->priv->ppt.index_k_output_values               = NULL;
-  
+
   cbe->priv->ppt.three_ceff2_ur                      = 0.0;
   cbe->priv->ppt.three_cvis2_ur                      = 0.0;
 
@@ -268,7 +280,7 @@ nc_cbe_init (NcCBE *cbe)
   cbe->priv->ppt.selection_width[0]                  = 0.0;
 
 	/* primordial structure */
- 
+
 	cbe->priv->ppm.primordial_spec_type = analytic_Pk;
 	cbe->priv->ppm.k_pivot              = 0.0;
 	cbe->priv->ppm.A_s                  = 0.0;
@@ -699,7 +711,7 @@ nc_cbe_ref (NcCBE* cbe)
  * Decreases the reference count of @cbe.
  *
  */
-void 
+void
 nc_cbe_free (NcCBE* cbe)
 {
 	g_object_unref (cbe);
@@ -712,7 +724,7 @@ nc_cbe_free (NcCBE* cbe)
  * Decreases the reference count of *@cbe and sets *@cbe to NULL.
  *
  */
-void 
+void
 nc_cbe_clear (NcCBE** cbe)
 {
 	g_clear_object (cbe);
@@ -726,7 +738,7 @@ nc_cbe_clear (NcCBE** cbe)
  * Sets the @cbe_prec as the precision object.
  *
  */
-void 
+void
 nc_cbe_set_precision (NcCBE* cbe, NcCBEPrecision* cbe_prec)
 {
 	nc_cbe_precision_clear (&cbe->prec);
@@ -744,7 +756,7 @@ static void _nc_cbe_update_callbacks (NcCBE* cbe);
  * Sets the @target_Cls target.
  *
  */
-void 
+void
 nc_cbe_set_target_Cls (NcCBE* cbe, NcDataCMBDataType target_Cls)
 {
 	if (cbe->target_Cls != target_Cls)
@@ -762,7 +774,7 @@ nc_cbe_set_target_Cls (NcCBE* cbe, NcDataCMBDataType target_Cls)
  * Sets whether it should calculate the transfer function.
  *
  */
-void 
+void
 nc_cbe_set_calc_transfer (NcCBE* cbe, gboolean calc_transfer)
 {
 	if ((calc_transfer && !cbe->calc_transfer) || (!calc_transfer && cbe->calc_transfer))
@@ -780,7 +792,7 @@ nc_cbe_set_calc_transfer (NcCBE* cbe, gboolean calc_transfer)
  * Sets whether it should use lensed Cl's.
  *
  */
-void 
+void
 nc_cbe_set_lensed_Cls (NcCBE* cbe, gboolean use_lensed_Cls)
 {
 	cbe->use_lensed_Cls = use_lensed_Cls;
@@ -795,7 +807,7 @@ nc_cbe_set_lensed_Cls (NcCBE* cbe, gboolean use_lensed_Cls)
  * Sets whether it should use tensor contribution.
  *
  */
-void 
+void
 nc_cbe_set_tensor (NcCBE* cbe, gboolean use_tensor)
 {
 	cbe->use_tensor = use_tensor;
@@ -810,7 +822,7 @@ nc_cbe_set_tensor (NcCBE* cbe, gboolean use_tensor)
  * Sets whether it should use the thermodynamics module.
  *
  */
-void 
+void
 nc_cbe_set_thermodyn (NcCBE* cbe, gboolean use_thermodyn)
 {
 	cbe->use_thermodyn = use_thermodyn;
@@ -826,7 +838,7 @@ nc_cbe_set_thermodyn (NcCBE* cbe, gboolean use_thermodyn)
  * angular power spectrum $C_{\ell}$ of the scalar mode is computed.
  *
  */
-void 
+void
 nc_cbe_set_scalar_lmax (NcCBE* cbe, guint scalar_lmax)
 {
 	if (cbe->scalar_lmax != scalar_lmax)
@@ -845,7 +857,7 @@ nc_cbe_set_scalar_lmax (NcCBE* cbe, guint scalar_lmax)
  * angular power spectrum $C_{\ell}$ of the vector mode is computed.
  *
  */
-void 
+void
 nc_cbe_set_vector_lmax (NcCBE* cbe, guint vector_lmax)
 {
 	if (cbe->vector_lmax != vector_lmax)
@@ -864,7 +876,7 @@ nc_cbe_set_vector_lmax (NcCBE* cbe, guint vector_lmax)
  * angular power spectrum $C_{\ell}$ of the tensor mode is computed.
  *
  */
-void 
+void
 nc_cbe_set_tensor_lmax (NcCBE* cbe, guint tensor_lmax)
 {
 	if (cbe->tensor_lmax != tensor_lmax)
@@ -882,7 +894,7 @@ nc_cbe_set_tensor_lmax (NcCBE* cbe, guint tensor_lmax)
  * Sets $z_\mathrm{max}$ for (until?) which the matter power spectrum $P(k, z)$ is evaluated.
  *
  */
-void 
+void
 nc_cbe_set_max_matter_pk_z (NcCBE* cbe, gdouble zmax)
 {
 	if (cbe->priv->psp.z_max_pk != zmax)
@@ -915,7 +927,7 @@ nc_cbe_get_max_matter_pk_z (NcCBE* cbe)
  * Sets $k_\mathrm{max}$ for which the matter power spectrum $P (k, z)$ is evaluated.
  *
  */
-void 
+void
 nc_cbe_set_max_matter_pk_k (NcCBE* cbe, gdouble kmax)
 {
 	if (cbe->priv->ppt.k_max_for_pk != kmax)
@@ -1128,7 +1140,7 @@ _nc_cbe_set_bg (NcCBE* cbe, NcHICosmo* cosmo)
       /* We must calculate M from omega or vice versa if one of them is missing.
          If both are present, we must update the degeneracy parameter to
          reflect the implicit normalisation of the distribution function.*/
-      
+
       guint n;
       gdouble rho_ncdm;
       for (n = 0; n < N_ncdm; n++)
@@ -1207,7 +1219,7 @@ _nc_cbe_set_bg (NcCBE* cbe, NcHICosmo* cosmo)
       cbe->priv->pba.Omega0_fld      = Omega_X0;
       cbe->priv->pba.w0_fld          = w0;
       cbe->priv->pba.wa_fld          = 0.0;
-      cbe->priv->pba.cs2_fld         = 1.0;      
+      cbe->priv->pba.cs2_fld         = 1.0;
     }
     else
     {
@@ -1234,7 +1246,7 @@ _nc_cbe_set_bg (NcCBE* cbe, NcHICosmo* cosmo)
   }
   else
     g_error ("_nc_cbe_set_bg: CLASS in not compatible with the model `%s'.", G_OBJECT_TYPE_NAME (cosmo));
-  
+
   cbe->priv->pba.shooting_failed = _FALSE_;
 	cbe->priv->pba.background_verbose = cbe->bg_verbose;
 }
@@ -1250,7 +1262,7 @@ _nc_cbe_set_thermo (NcCBE* cbe, NcHICosmo* cosmo)
 	cbe->priv->pth.YHe                  = nc_hicosmo_Yp_4He (cosmo);
 	cbe->priv->pth.recombination        = recfast;
 	cbe->priv->pth.reio_parametrization = reio_camb;
-  
+
 	if (NC_IS_HIREION_CAMB (reion))
 	{
 		cbe->priv->pth.reio_z_or_tau = reio_z;
@@ -1263,7 +1275,7 @@ _nc_cbe_set_thermo (NcCBE* cbe, NcHICosmo* cosmo)
 		cbe->priv->pth.z_reio        = 13.0;
 		cbe->priv->pth.tau_reio      = nc_hireion_get_tau (reion, cosmo);
 	}
-  
+
 	cbe->priv->pth.reionization_exponent      = 1.5;
 	cbe->priv->pth.reionization_width         = 0.5;
 	cbe->priv->pth.helium_fullreio_redshift   = 3.5;
@@ -1379,7 +1391,7 @@ _nc_cbe_set_pert (NcCBE* cbe, NcHICosmo* cosmo)
 
   /* This is set elsewhere */
   /*cbe->priv->ppt.z_max_pk                            = 0.0;*/
-  
+
 	cbe->priv->ppt.selection_num                       = 1;
 	cbe->priv->ppt.selection                           = gaussian;
 	cbe->priv->ppt.selection_mean[0]                   = 1.0;
@@ -1505,7 +1517,7 @@ _nc_cbe_set_transfer (NcCBE* cbe, NcHICosmo* cosmo)
 
   cbe->priv->ptr.selection_bias[0]               = 1.0;
   cbe->priv->ptr.selection_magnification_bias[0] = 1.0;
-  
+
 	cbe->priv->ptr.lcmb_rescale                    = 1.0;
 	cbe->priv->ptr.lcmb_pivot                      = 0.1;
 	cbe->priv->ptr.lcmb_tilt                       = 0.0;
@@ -1867,10 +1879,10 @@ void nc_cbe_prepare_if_needed (NcCBE* cbe, NcHICosmo* cosmo)
  * @cbe: a #NcCBE
  * @cosmo: a #NcHICosmo
  * @log_cmp: whether to print the comparison
- * 
+ *
  * Compares CLASS and NumCosmo background calculations and returns the worst discrepancy.
- * 
- * Returns: worst error. 
+ *
+ * Returns: worst error.
  */
 gdouble
 nc_cbe_compare_bg (NcCBE *cbe, NcHICosmo *cosmo, gboolean log_cmp)
@@ -1959,8 +1971,8 @@ nc_cbe_compare_bg (NcCBE *cbe, NcHICosmo *cosmo, gboolean log_cmp)
         err = GSL_MAX (err, rho_crit_diff);
 
         if (log_cmp)
-          printf ("# eta = % 22.15g a = % 10.5e | % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e [% 10.5e]\n", 
-                  eta, pvecback[pba->index_bg_a], 
+          printf ("# eta = % 22.15g a = % 10.5e | % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e % 10.5e [% 10.5e]\n",
+                  eta, pvecback[pba->index_bg_a],
                   a_diff,          /* 01 */
                   H_diff,          /* 02 */
                   Hprime_diff,     /* 03 */
@@ -2027,7 +2039,7 @@ nc_cbe_thermodyn_get_Xe (NcCBE* cbe)
  *
  * Returns: $z_\mathrm{rec}$.
  */
-gdouble 
+gdouble
 nc_cbe_thermodyn_v_tau_max_z (NcCBE *cbe)
 {
   return cbe->priv->pth.z_rec;
@@ -2041,7 +2053,7 @@ nc_cbe_thermodyn_v_tau_max_z (NcCBE *cbe)
  *
  * Returns: $z_d$.
  */
-gdouble 
+gdouble
 nc_cbe_thermodyn_z_d (NcCBE *cbe)
 {
   return cbe->priv->pth.z_d;
@@ -2098,7 +2110,7 @@ nc_cbe_get_matter_ps (NcCBE* cbe)
 
 			ncm_vector_set (z_v, m, z_i);
 			spectra_pk_at_z (&cbe->priv->pba, &cbe->priv->psp, logarithmic, z_i, ncm_matrix_ptr (lnPk, m, 0), NULL);
-      
+
 			m++;
 		}
 	}
@@ -2175,7 +2187,7 @@ nc_cbe_get_matter_ps (NcCBE* cbe)
  * ignored.
  *
  */
-void 
+void
 nc_cbe_get_all_Cls (NcCBE* cbe, NcmVector* PHIPHI_Cls, NcmVector* TT_Cls, NcmVector* EE_Cls, NcmVector* BB_Cls, NcmVector* TE_Cls)
 {
 	guint all_Cls_size, index_pp, index_tt, index_ee, index_bb, index_te;
@@ -2281,7 +2293,7 @@ nc_cbe_get_all_Cls (NcCBE* cbe, NcmVector* PHIPHI_Cls, NcmVector* TT_Cls, NcmVec
  * Temporary debug function
  *
  */
-void 
+void
 nc_cbe_debug_test (NcCBE *cbe)
 {
 	NCM_UNUSED (cbe);
